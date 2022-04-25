@@ -11,10 +11,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import {MatSelectModule} from '@angular/material/select';
-import {MatInputModule} from '@angular/material/input';
-import {MatButtonToggleModule} from '@angular/material/button-toggle';
-import {MatDatepickerModule} from '@angular/material/datepicker';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+//import { MatDatepickerModule } from '@angular/material/datepicker';
+//import { MatNativeDateModule } from '@angular/material/core';
+import {MatSliderModule} from '@angular/material/slider';
 
 @NgModule({
   declarations: [
@@ -36,7 +38,9 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
     MatSelectModule,
     MatInputModule,
     MatButtonToggleModule,
-    MatDatepickerModule
+    //MatDatepickerModule,
+    //MatNativeDateModule
+    MatSliderModule
   ],
   providers: [],
   bootstrap: [AppComponent]

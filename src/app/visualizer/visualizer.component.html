@@ -17,7 +17,20 @@
     <mat-button-toggle value="deaths">Deaths</mat-button-toggle>
 </mat-button-toggle-group>
 
+<mat-slider
+  thumbLabel
+  [displayWith]="formatLabel"
+  tickInterval="30"
+  step="1"
+  min="1"
+  max="{{maxPeriod}}"
+  aria-label="units"
+  [(ngModel)]="chartPeriod"
+  (ngModelChange)="setStartDate()"
+  invert>
+</mat-slider>
 
+{{startDate}}
 
 <div>
     <ngx-charts-line-chart 

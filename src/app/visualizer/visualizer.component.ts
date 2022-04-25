@@ -27,8 +27,11 @@ export class VisualizerComponent implements OnInit {
   // initial data specifications
   selector: string = 'cases';
   country:  string = 'Germany';
-  startDate: Date = new Date('05 October 2021 00:00 UTC');
-  endDate: Date = new Date('15 October 2021 00:00 UTC');
+  startDate: Date = new Date('01 January 2022 00:00 UTC');
+  endDate: Date = new Date();
+  maxDate: Date = new Date("2020-01-22");
+  maxPeriod: number = Math.floor((this.endDate.getTime() - this.maxDate.getTime()) / (1000 * 3600 * 24));
+  chartPeriod: number;
 
   constructor(private dataService: DataService) { }
 
@@ -98,6 +101,20 @@ export class VisualizerComponent implements OnInit {
       this.loadChart()
     }
     
+  }
+
+  formatLabel(value: number) {
+    if (value < 30) {
+      return value + 'd';
+    } else if (value >= 30){
+      return Math.floor(value/30) + 'm';
+    }
+    return value;
+  }
+
+  setStartDate(){
+    this.startDate = new Date(new Date().setDate(this.endDate.getDate() - this.chartPeriod));
+    this.loadChart();
   }
 
 }
