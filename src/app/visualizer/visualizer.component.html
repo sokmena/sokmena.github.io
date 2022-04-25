@@ -1,0 +1,27 @@
+
+<label>
+    <input type="radio" name="data" [(ngModel)]="selector" (ngModelChange)="loadChart()" value="cases"> Cases
+</label>
+<label>
+    <input type="radio" name="data" [(ngModel)]="selector" (ngModelChange)="loadChart()" value="deaths"> Deaths
+</label>
+
+
+
+<ngx-charts-line-chart 
+    [view]="[1000,400]"
+    [results]="chartData"
+    [xScaleMin]="startDate"
+    [xScaleMax]="endDate"
+    [xAxisLabel]="'date'"
+    [legendTitle]="'Legend'"
+    [yAxisLabel]="'cases'"
+    [legend]="true"
+    [showXAxisLabel]="true"
+    [showYAxisLabel]="true"
+    [timeline]="false"
+    [xAxis]="true"
+    [yAxis]="true"
+    [autoScale]="false"
+    [gradient]="true">
+</ngx-charts-line-chart>
