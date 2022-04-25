@@ -5,7 +5,7 @@ import { DataPoint } from '../datapoint';
 import { DataService } from '../services/data.service';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { debounceTime, map, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-visualizer',
@@ -36,13 +36,9 @@ export class VisualizerComponent implements OnInit {
 
   
   ngOnInit() {
-
+    
     this.filteredCountries = this.control.valueChanges.pipe(startWith(''), map(value => this._filter(value)))
-    //console.log(this.dataService.getData().subscribe(result => console.log(JSON.stringify(result))));
-    //this.chartData = series;
-    // return this.dataService.getData(this.country, this.startDate.toISOString(), this.endDate.toISOString()).subscribe((data: string) => console.log(JSON.parse(data)));
-    // return this.dataService.getData(this.country, this.startDate.toISOString(), this.endDate.toISOString()).subscribe((data: string) => this.chartData = JSON.parse(data)[0].confirmed);
-    //this.dataService.getData(this.country, this.startDate.toISOString(), this.endDate.toISOString()).subscribe((data: string) => this.chartData = this.loadChartData(JSON.parse(data), this.selector));
+
     this.loadChart();
   }
 
@@ -51,18 +47,6 @@ export class VisualizerComponent implements OnInit {
   }
   // extract JSON data from the stream into a data object
   loadChartData(jsonData: Object, selector: string) {
-    /*
-    let series = [
-      {
-          "name": "cases",
-          "series":this.addCases(jsonData)
-      },
-      {
-          "name": "deaths",
-          "series":this.addDeaths(jsonData)
-      }
-    ];
-    */
 
     if (selector ==='cases') {
       return [
@@ -80,35 +64,6 @@ export class VisualizerComponent implements OnInit {
       ];
     }
     
-    //series["cases"] = [];
-    //series["deaths"] = [];
-/*
-    Object.values(jsonData).forEach((value: Object) => {
-      
-      //this.chartData.push(new DataPoint(value["date"], value["confirmed"], value["deaths"]));
-      //console.log(value["confirmed"]);
-      let date: Date = new Date(value["date"])
-      series["cases"].push({"name": date, "value": value["confirmed_daily"]});
-      series["deaths"].push({"name": date, "value": value["deaths_daily"]});
-      
-    }
-    
-    );
-    */
-
-    /*
-    for (const [index, [, value]] of Object.entries(Object.entries(jsonData))) {
-      
-      series["cases"][index] = {"name": value.date, "value": value.confirmed_daily};
-      series["deaths"][index] = {"name": value.date, "value": value.deaths_daily};
-
-    }
-    console.log(series);
-    */
-
-    //return series;
-    //this.chartData = this.series;
-    //console.log(this.chartData);
   }
 
   addCases(jsonData: Object){
@@ -137,9 +92,12 @@ export class VisualizerComponent implements OnInit {
     return this.countries.filter(country => country.toLowerCase().startsWith(filterValue))
   }
 
-  displayFn(subject) {
-    console.log(subject)
-    return subject ? subject.name : undefined
+  // simple method to save server resources: only load chart if input is correct
+  loadChartIfCorrect(){
+    if (this.countries.includes(this.country)){
+      this.loadChart()
+    }
+    
   }
 
 }

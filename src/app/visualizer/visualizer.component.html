@@ -1,20 +1,9 @@
-<!--
-<label>
-    <input type="radio" name="data" [(ngModel)]="selector" (ngModelChange)="loadChart()" value="cases"> Cases
-</label>
-<label>
-    <input type="radio" name="data" [(ngModel)]="selector" (ngModelChange)="loadChart()" value="deaths"> Deaths
-</label>
--->
-
-
-
 <div>
     <form>
         <mat-form-field>
             <label for="ctr">Select a country:</label>
-            <input type="text" name="ctr" [(ngModel)]="country" (ngModelChange)="loadChart()" matInput [matAutocomplete]="auto" [formControl]="control" [value]="country">
-            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+            <input type="text" name="ctr" [(ngModel)]="country" (ngModelChange)="loadChartIfCorrect()" matInput [matAutocomplete]="auto" [formControl]="control" [value]="country">
+            <mat-autocomplete #auto="matAutocomplete" >
                 <mat-option [value]="country" *ngFor="let country of filteredCountries | async" >
                     {{country}}
                 </mat-option>
