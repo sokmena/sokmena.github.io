@@ -1,27 +1,51 @@
-
+<!--
 <label>
     <input type="radio" name="data" [(ngModel)]="selector" (ngModelChange)="loadChart()" value="cases"> Cases
 </label>
 <label>
     <input type="radio" name="data" [(ngModel)]="selector" (ngModelChange)="loadChart()" value="deaths"> Deaths
 </label>
+-->
 
 
 
-<ngx-charts-line-chart 
-    [view]="[1000,400]"
-    [results]="chartData"
-    [xScaleMin]="startDate"
-    [xScaleMax]="endDate"
-    [xAxisLabel]="'date'"
-    [legendTitle]="'Legend'"
-    [yAxisLabel]="'cases'"
-    [legend]="true"
-    [showXAxisLabel]="true"
-    [showYAxisLabel]="true"
-    [timeline]="false"
-    [xAxis]="true"
-    [yAxis]="true"
-    [autoScale]="false"
-    [gradient]="true">
-</ngx-charts-line-chart>
+<div>
+    <form>
+        <mat-form-field>
+            <label for="ctr">Select a country:</label>
+            <input type="text" name="ctr" [(ngModel)]="country" (ngModelChange)="loadChart()" matInput [matAutocomplete]="auto" [formControl]="control" [value]="country">
+            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+                <mat-option [value]="country" *ngFor="let country of filteredCountries | async" >
+                    {{country}}
+                </mat-option>
+            </mat-autocomplete>
+        </mat-form-field>
+    </form>
+</div>
+
+<mat-button-toggle-group name="fontStyle" aria-label="Font Style" [(ngModel)]="selector" (ngModelChange)="loadChart()">
+    <mat-button-toggle value="cases">Cases</mat-button-toggle>
+    <mat-button-toggle value="deaths">Deaths</mat-button-toggle>
+</mat-button-toggle-group>
+
+
+
+<div>
+    <ngx-charts-line-chart 
+        [view]="[800,400]"
+        [results]="chartData"
+        [xScaleMin]="startDate"
+        [xScaleMax]="endDate"
+        [xAxisLabel]="'date'"
+        [legendTitle]="'Legend'"
+        [yAxisLabel]="selector"
+        [legend]="false"
+        [showXAxisLabel]="true"
+        [showYAxisLabel]="true"
+        [timeline]="false"
+        [xAxis]="true"
+        [yAxis]="true"
+        [autoScale]="false"
+        [gradient]="true">
+    </ngx-charts-line-chart>
+</div>
