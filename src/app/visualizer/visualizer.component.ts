@@ -14,8 +14,6 @@ import * as shape from 'd3-shape';
 })
 export class VisualizerComponent implements OnInit {
   
-
-
   // initial data specifications
   selector: string = 'cases';
   country:  string = 'Germany';
@@ -75,7 +73,7 @@ export class VisualizerComponent implements OnInit {
     let cases = [];
     for (const [index, [, value]] of Object.entries(Object.entries(jsonData))) {
       
-      cases.push({"name": value.date, "value": value.confirmed_daily});
+      cases.push({"name": new Date(value.date).getTime(), "value": value.confirmed_daily});
 
     }
     return cases;
@@ -85,7 +83,7 @@ export class VisualizerComponent implements OnInit {
     let deaths = [];
     for (const [index, [, value]] of Object.entries(Object.entries(jsonData))) {
       
-      deaths.push({"name": value.date, "value": value.deaths_daily});
+      deaths.push({"name": new Date(value.date).getTime(), "value": value.deaths_daily});
 
     }
     return deaths;
@@ -124,8 +122,8 @@ export class VisualizerComponent implements OnInit {
   }
 
   // format chart date to date string
-  chartDateFormatting(val:Date) {
-    return val.toString().substring(0,10);
+  chartDateFormatting(val:number) {
+    return new Date(val).toLocaleString('sv').substring(0,10);
   }
 
 }
