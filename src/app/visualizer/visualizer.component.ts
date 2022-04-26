@@ -1,11 +1,9 @@
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
-import { Subject } from 'rxjs/internal/Subject';
-import { DataPoint } from '../datapoint';
-//import { series } from '../series';
 import { DataService } from '../services/data.service';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { debounceTime, map, startWith } from 'rxjs/operators';
+import { map, startWith } from 'rxjs/operators';
+import * as shape from 'd3-shape';
 
 @Component({
   selector: 'app-visualizer',
@@ -33,9 +31,12 @@ export class VisualizerComponent implements OnInit {
   maxPeriod: number = Math.floor((this.endDate.getTime() - this.maxDate.getTime()) / (1000 * 3600 * 24));
   chartPeriod: number;
 
-  constructor(private dataService: DataService) { }
+  // shape of the curve
+  curve = shape.curveBasis;
 
   chartData : any;
+
+  constructor(private dataService: DataService) { }
 
   
   ngOnInit() {
@@ -45,10 +46,12 @@ export class VisualizerComponent implements OnInit {
     this.loadChart();
   }
 
+  // gets the API data into the ngx-chart
   loadChart(){
     this.dataService.getData(this.country, this.startDate.toISOString(), this.endDate.toISOString()).subscribe((data: string) => this.chartData = this.loadChartData(JSON.parse(data), this.selector));
   }
-  // extract JSON data from the stream into a data object
+
+  // extracts JSON data from the stream into a data object
   loadChartData(jsonData: Object, selector: string) {
 
     if (selector ==='cases') {
@@ -103,7 +106,8 @@ export class VisualizerComponent implements OnInit {
     
   }
 
-  formatLabel(value: number) {
+  // formatting for the slider label
+  formatSliderLabel(value: number) {
     if (value < 30) {
       return value + 'd';
     } else if (value >= 30){
@@ -112,9 +116,15 @@ export class VisualizerComponent implements OnInit {
     return value;
   }
 
+  // sets start date for the chart
   setStartDate(){
     this.startDate = new Date(new Date().setDate(this.endDate.getDate() - this.chartPeriod));
     this.loadChart();
+  }
+
+  // format chart date to date string
+  chartDateFormatting(val:Date) {
+    return val.toString().substring(0,10);
   }
 
 }

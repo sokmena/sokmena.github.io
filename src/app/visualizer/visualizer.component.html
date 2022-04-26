@@ -1,53 +1,66 @@
-<div>
-    <form>
-        <mat-form-field>
-            <label for="ctr">Select a country:</label>
-            <input type="text" name="ctr" [(ngModel)]="country" (ngModelChange)="loadChartIfCorrect()" matInput [matAutocomplete]="auto" [formControl]="control" [value]="country">
-            <mat-autocomplete #auto="matAutocomplete" >
-                <mat-option [value]="country" *ngFor="let country of filteredCountries | async" >
-                    {{country}}
-                </mat-option>
-            </mat-autocomplete>
-        </mat-form-field>
-    </form>
-</div>
 
-<mat-button-toggle-group name="fontStyle" aria-label="Font Style" [(ngModel)]="selector" (ngModelChange)="loadChart()">
-    <mat-button-toggle value="cases">Cases</mat-button-toggle>
-    <mat-button-toggle value="deaths">Deaths</mat-button-toggle>
-</mat-button-toggle-group>
-
-<mat-slider
-  thumbLabel
-  [displayWith]="formatLabel"
-  tickInterval="30"
-  step="1"
-  min="1"
-  max="{{maxPeriod}}"
-  aria-label="units"
-  [(ngModel)]="chartPeriod"
-  (ngModelChange)="setStartDate()"
-  invert>
-</mat-slider>
-
-{{startDate}}
-
-<div>
-    <ngx-charts-line-chart 
-        [view]="[800,400]"
-        [results]="chartData"
-        [xScaleMin]="startDate"
-        [xScaleMax]="endDate"
-        [xAxisLabel]="'date'"
-        [legendTitle]="'Legend'"
-        [yAxisLabel]="selector"
-        [legend]="false"
-        [showXAxisLabel]="true"
-        [showYAxisLabel]="true"
-        [timeline]="false"
-        [xAxis]="true"
-        [yAxis]="true"
-        [autoScale]="false"
-        [gradient]="true">
-    </ngx-charts-line-chart>
+<br>
+<div class="center">
+<table id="tableSection" class="center">
+    <tr>
+        <th>
+            <form>
+                Type a country:
+                <mat-form-field>
+                    <input type="text" name="ctr" [(ngModel)]="country" (ngModelChange)="loadChartIfCorrect()" matInput [matAutocomplete]="auto" [formControl]="control" [value]="country">
+                    <mat-autocomplete #auto="matAutocomplete" >
+                        <mat-option [value]="country" *ngFor="let country of filteredCountries | async" >
+                            {{country}}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+            </form>
+        </th>
+        <th>
+            Show:
+            <mat-button-toggle-group name="fontStyle" aria-label="Font Style" [(ngModel)]="selector" (ngModelChange)="loadChart()">
+                <mat-button-toggle value="cases">Cases</mat-button-toggle>
+                <mat-button-toggle value="deaths">Deaths</mat-button-toggle>
+            </mat-button-toggle-group>
+        </th>
+        <th>
+            Select a starting point:
+            <mat-slider
+            thumbLabel
+            [displayWith]="formatSliderLabel"
+            tickInterval="30"
+            step="1"
+            min="1"
+            max="{{maxPeriod}}"
+            aria-label="units"
+            [(ngModel)]="chartPeriod"
+            (ngModelChange)="setStartDate()"
+            invert>
+            </mat-slider>
+        </th>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <ngx-charts-line-chart 
+            [view]="[1000,500]"
+            [results]="chartData"
+            [xScaleMin]="startDate"
+            [xScaleMax]="endDate"
+            [xAxisLabel]="'date'"
+            [legendTitle]="'Legend'"
+            [yAxisLabel]="selector"
+            [legend]="false"
+            [showXAxisLabel]="true"
+            [showYAxisLabel]="true"
+            [xAxisTickFormatting]="chartDateFormatting"
+            [timeline]="false"
+            [xAxis]="true"
+            [yAxis]="true"
+            [autoScale]="false"
+            [curve]="curve"
+            [gradient]="true">
+            </ngx-charts-line-chart>
+        </td>
+    </tr>
+</table>
 </div>

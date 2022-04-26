@@ -1,3 +1,9 @@
+#tableSection {
+  border: 3px solid #FFBF00;
+  padding: 10px;
+}
+
+
 mat-slider {
     width: 300px;
   }
