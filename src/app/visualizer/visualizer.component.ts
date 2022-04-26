@@ -120,7 +120,7 @@ export class VisualizerComponent implements OnInit {
   // sets start date for the chart
   setStartDate(){
     this.startDate = new Date(new Date().setDate(this.endDate.getDate() - this.chartPeriod));
-    this.loadChart();
+    this.loadChartIfCorrect();
   }
 
   // format chart date to date string

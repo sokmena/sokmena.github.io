@@ -18,7 +18,7 @@
         </th>
         <th>
             Show:
-            <mat-button-toggle-group name="fontStyle" aria-label="Font Style" [(ngModel)]="selector" (ngModelChange)="loadChart()">
+            <mat-button-toggle-group name="fontStyle" aria-label="Font Style" [(ngModel)]="selector" (ngModelChange)="loadChartIfCorrect()">
                 <mat-button-toggle value="cases">Cases</mat-button-toggle>
                 <mat-button-toggle value="deaths">Deaths</mat-button-toggle>
             </mat-button-toggle-group>
