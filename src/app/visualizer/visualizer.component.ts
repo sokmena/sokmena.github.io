@@ -37,7 +37,7 @@ export class VisualizerComponent implements OnInit {
 
   
   ngOnInit() {
-    
+    console.log(this.maxPeriod);
     this.filteredCountries = this.control.valueChanges.pipe(startWith(''), map(value => this._filter(value)))
 
     this.loadChart();
@@ -71,7 +71,7 @@ export class VisualizerComponent implements OnInit {
 
   addCases(jsonData: Object){
     let cases = [];
-    for (const [index, [, value]] of Object.entries(Object.entries(jsonData))) {
+    for (const [, [, value]] of Object.entries(Object.entries(jsonData))) {
       
       cases.push({"name": new Date(value.date).getTime(), "value": value.confirmed_daily});
 
@@ -81,7 +81,7 @@ export class VisualizerComponent implements OnInit {
   
   addDeaths(jsonData: Object){
     let deaths = [];
-    for (const [index, [, value]] of Object.entries(Object.entries(jsonData))) {
+    for (const [, [, value]] of Object.entries(Object.entries(jsonData))) {
       
       deaths.push({"name": new Date(value.date).getTime(), "value": value.deaths_daily});
 
@@ -114,6 +114,7 @@ export class VisualizerComponent implements OnInit {
     }
     return value;
   }
+
 
   // sets start date for the chart
   setStartDate(){
