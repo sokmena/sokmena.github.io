@@ -3,8 +3,8 @@ import { DataService } from '../services/data.service';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
-import { countries } from 'src/app/countries'
 import * as shape from 'd3-shape';
+import { countriesJ } from '../countriesJ';
 
 @Component({
   selector: 'app-visualizer',
@@ -37,7 +37,6 @@ export class VisualizerComponent implements OnInit {
 
   
   ngOnInit() {
-    console.log(this.maxPeriod);
     this.filteredCountries = this.control.valueChanges.pipe(startWith(''), map(value => this._filter(value)))
 
     this.loadChart();
@@ -45,6 +44,9 @@ export class VisualizerComponent implements OnInit {
 
   // gets the API data into the ngx-chart
   loadChart(){
+
+    let countryUid = countriesJ[this.country];
+
     this.dataService.getData(this.country, this.startDate.toISOString(), this.endDate.toISOString()).subscribe((data: string) => this.chartData = this.loadChartData(JSON.parse(data), this.selector));
   }
 
@@ -95,12 +97,12 @@ export class VisualizerComponent implements OnInit {
   */
   _filter(value: string) : string[] {
     const filterValue = value.toLowerCase();
-    return countries.filter(country => country.toLowerCase().startsWith(filterValue))
+    return Object.keys(countriesJ).filter(country => country.toLowerCase().startsWith(filterValue))
   }
 
   // simple method to save server resources: only load chart if input is correct
   loadChartIfCorrect(){
-    if (countries.includes(this.country)){
+    if (Object.keys(countriesJ).includes(this.country)){
       this.loadChart()
     }
   }
