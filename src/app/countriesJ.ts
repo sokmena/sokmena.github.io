@@ -187,7 +187,7 @@ export const countriesJ =
   "Egypt": "818",
   "United Kingdom": "826",
   "Tanzania": "834",
-  "US": "840",
+  // "US": "840",
   "Burkina Faso": "854",
   "Uruguay": "858",
   "Uzbekistan": "860",

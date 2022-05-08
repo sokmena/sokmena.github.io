@@ -47,7 +47,7 @@ export class VisualizerComponent implements OnInit {
 
     let countryUid = countriesJ[this.country];
 
-    this.dataService.getData(this.country, this.startDate.toISOString(), this.endDate.toISOString()).subscribe((data: string) => this.chartData = this.loadChartData(JSON.parse(data), this.selector));
+    this.dataService.getData(countryUid, this.startDate.toISOString(), this.endDate.toISOString()).subscribe((data: string) => this.chartData = this.loadChartData(JSON.parse(data), this.selector));
   }
 
   // extracts JSON data from the stream into a data object
