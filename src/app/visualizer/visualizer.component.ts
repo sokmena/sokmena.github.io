@@ -32,6 +32,7 @@ export class VisualizerComponent implements OnInit {
 
   // this will feed into the chart
   chartData : any;
+  averageData :any;
 
   constructor(private dataService: DataService) { }
 
@@ -47,52 +48,43 @@ export class VisualizerComponent implements OnInit {
 
     let countryUid = countriesJ[this.country];
 
-    this.dataService.getData(countryUid, this.startDate.toISOString(), this.endDate.toISOString()).subscribe((data: string) => this.chartData = this.loadChartData(JSON.parse(data), this.selector));
+    this.dataService.getData(countryUid, this.maxDate.toISOString(), this.endDate.toISOString()).subscribe((data: string) => this.chartData = this.loadChartData(JSON.parse(data), this.selector));
   }
 
   // extracts JSON data from the stream into a data object
   loadChartData(jsonData: Object, selector: string) {
-
-    if (selector ==='cases') {
       return [
         {
-            "name": "cases",
-            "series":this.addCases(jsonData)
+            "name": selector,
+            "series":this.addData(jsonData, selector)
         }
       ];
-    } else if (selector ==='deaths') {
-      return [
-        {
-            "name": "deaths",
-            "series":this.addDeaths(jsonData)
-        }
-      ];
-    }
-    
   }
 
-  addCases(jsonData: Object){
-    let cases = [];
+  // method to turn JSON data to multi-series
+  addData(jsonData: Object, selector: string) {
+    let data = [];
+    let param : string;
+
+    if (selector === "cases") {
+      param = "confirmed_daily"
+    } else if (selector === "deaths")  {
+      param = "deaths_daily"
+    } else {
+      console.warn("Invalid selector")
+      return
+    }
+
     for (const [, [, value]] of Object.entries(Object.entries(jsonData))) {
       
-      cases.push({"name": new Date(value.date).getTime(), "value": value.confirmed_daily});
+      data.push({"name": new Date(value.date).getTime(), "value": value[param]});
 
     }
-    return cases;
-  }
-  
-  addDeaths(jsonData: Object){
-    let deaths = [];
-    for (const [, [, value]] of Object.entries(Object.entries(jsonData))) {
-      
-      deaths.push({"name": new Date(value.date).getTime(), "value": value.deaths_daily});
-
-    }
-    return deaths;
+    return data;
   }
 
   /*
-  Filter function, based on Codevolution sample 
+  Filter function, based on sample
   link: https://github.com/gopinav/Angular-Material-Tutorial/tree/master/material-demo/src/app/autocomplete
   */
   _filter(value: string) : string[] {
