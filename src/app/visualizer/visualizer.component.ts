@@ -43,7 +43,7 @@ export class VisualizerComponent implements OnInit {
     this.loadChart();
   }
 
-  // gets the API data into the ngx-chart
+  // gets the API data
   loadChart(){
 
     let countryUid = countriesJ[this.country];
@@ -57,12 +57,16 @@ export class VisualizerComponent implements OnInit {
         {
             "name": selector,
             "series":this.addData(jsonData, selector)
+        },
+        {
+            "name": selector + " (rolling average)",
+            "series":this.addData(jsonData, selector, true)
         }
       ];
   }
 
   // method to turn JSON data to multi-series
-  addData(jsonData: Object, selector: string) {
+  addData(jsonData: Object, selector: string, average?: boolean) {
     let data = [];
     let param : string;
 
@@ -75,11 +79,18 @@ export class VisualizerComponent implements OnInit {
       return
     }
 
+    // calculate moving average
+    if (average) {
+      // TODO
+      return data;
+    }
+
     for (const [, [, value]] of Object.entries(Object.entries(jsonData))) {
       
       data.push({"name": new Date(value.date).getTime(), "value": value[param]});
 
     }
+
     return data;
   }
 
@@ -99,21 +110,10 @@ export class VisualizerComponent implements OnInit {
     }
   }
 
-  // formatting for the slider label
-  formatSliderLabel(value: number) {
-    if (value < 30) {
-      return value + 'd';
-    } else if (value >= 30){
-      return Math.floor(value/30) + 'm';
-    }
-    return value;
-  }
-
-
   // sets start date for the chart
   setStartDate(){
     this.startDate = new Date(new Date().setDate(this.endDate.getDate() - this.chartPeriod));
-    this.loadChartIfCorrect();
+    //this.loadChartIfCorrect();
   }
 
   // format chart date to date string
@@ -122,3 +122,18 @@ export class VisualizerComponent implements OnInit {
   }
 
 }
+
+/*
+TODO:
+
+CORE
+- write a moving average function, preferably inside the for loop in addData()
+- decide on how to display the two series and implement
+
+OTHER
+- add error handling as much as possible
+- solve the ngx charts Y axis scale issues
+- find a more elegant way to validate input than loadChartIfCorrect()
+- handle edge case where user enters wrong country name and changes dates (perhaps by disabling the date buttons -this can also get rid of loadChartIfCorrect())
+
+*/
