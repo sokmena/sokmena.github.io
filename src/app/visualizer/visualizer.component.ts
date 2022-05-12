@@ -79,16 +79,18 @@ export class VisualizerComponent implements OnInit {
       return
     }
 
-    // calculate moving average
-    if (average) {
-      // TODO
-      return data;
-    }
 
     for (const [, [, value]] of Object.entries(Object.entries(jsonData))) {
       
       data.push({"name": new Date(value.date).getTime(), "value": value[param]});
 
+    }
+
+    // get moving average
+    if (average) {
+    let averageData = this.simpleMovingAverage(data);
+
+    return averageData;
     }
 
     return data;
@@ -121,13 +123,40 @@ export class VisualizerComponent implements OnInit {
     return new Date(val).toLocaleString('sv').substring(0,10);
   }
 
+  // a function calculating simple moving average given an array of Objects
+  // modified from source: https://blog.oliverjumpertz.dev/the-moving-average-simple-and-exponential-theory-math-and-implementation-in-javascript
+  simpleMovingAverage(data: any, window = 7) {
+    if (!data || data.length < window) {
+      return [];
+    }
+  
+    let index = window - 1;
+    const length = data.length + 1;
+  
+    let simpleMovingAverages = new Array();
+  
+    while (++index < length) {
+      const windowSlice = data.slice(index - window, index);
+      const valueSlice = windowSlice.map(a => a.value);
+      
+      const sum = valueSlice.reduce((prev, curr) => prev + curr, 0);
+
+      let input = JSON.parse(JSON.stringify(data[Object.keys(data)[index - 1]]));
+      
+      input.value = sum / window;
+      
+      //simpleMovingAverages.push({"name": data[Object.keys(data)[index]].name,"value": sum / window});
+      simpleMovingAverages.push(input);
+    }
+    return simpleMovingAverages;
+  }
+  
 }
 
 /*
 TODO:
 
 CORE
-- write a moving average function, preferably inside the for loop in addData()
 - decide on how to display the two series and implement
 
 OTHER
