@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { DataService } from '../services/data.service';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -22,6 +22,7 @@ export class VisualizerComponent implements OnInit {
   maxDate: Date = new Date("2020-01-22");
   maxPeriod: number = Math.floor((this.endDate.getTime() - this.maxDate.getTime()) / (1000 * 3600 * 24));
   chartPeriod: number;
+  yScaleMax : number;
 
   // form control and autocomplete elements
   control = new FormControl();
@@ -31,9 +32,9 @@ export class VisualizerComponent implements OnInit {
   curve = shape.curveMonotoneX;
 
   // this will feed into the chart
-  chartData : any;
-  averageData :any;
-
+  chartData = [];
+  averageData = [];
+ 
   constructor(private dataService: DataService) { }
 
   
@@ -150,6 +151,16 @@ export class VisualizerComponent implements OnInit {
     }
     return simpleMovingAverages;
   }
+
+  // calculates the max value for the y axis based on array values in selected period
+  getYScaleMax() {
+    if (this.chartData.length > 0){
+      let values = this.chartData[0].series.map(a => a.value).slice(-this.chartPeriod);
+      this.yScaleMax = Math.max(...values);
+    }
+
+    return this.yScaleMax;
+  }
   
 }
 
@@ -161,7 +172,6 @@ CORE
 
 OTHER
 - add error handling as much as possible
-- solve the ngx charts Y axis scale issues
 - find a more elegant way to validate input than loadChartIfCorrect()
 - handle edge case where user enters wrong country name and changes dates (perhaps by disabling the date buttons -this can also get rid of loadChartIfCorrect())
 
