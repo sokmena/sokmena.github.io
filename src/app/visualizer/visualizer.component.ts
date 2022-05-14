@@ -49,7 +49,7 @@ export class VisualizerComponent implements OnInit {
 
     let countryUid = countriesJ[this.country];
 
-    this.dataService.getData(countryUid, this.maxDate.toISOString(), this.endDate.toISOString()).subscribe((data: string) => this.chartData = this.loadChartData(JSON.parse(data), this.selector));
+    this.dataService.getData(countryUid, this.maxDate.toISOString(), this.endDate.toISOString()).subscribe((data: string) => this.chartData = this.loadChartData(JSON.parse(data), this.selector), err => console.error('Error: ' + err));
   }
 
   // extracts JSON data from the stream into a data object
@@ -146,7 +146,6 @@ export class VisualizerComponent implements OnInit {
       
       input.value = sum / window;
       
-      //simpleMovingAverages.push({"name": data[Object.keys(data)[index]].name,"value": sum / window});
       simpleMovingAverages.push(input);
     }
     return simpleMovingAverages;
