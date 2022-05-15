@@ -28,8 +28,14 @@ export class VisualizerComponent implements OnInit {
   control = new FormControl();
   filteredCountries: Observable<string[]>;
   
-  // shape of the curve
+  // shape and color of the curves
   curve = shape.curveMonotoneX;
+  colorScheme = {
+      domain: [
+        '#85C1E9', 
+        '#BF1919'
+      ]
+    };
 
   // this will feed into the chart
   chartData = [];
@@ -49,7 +55,11 @@ export class VisualizerComponent implements OnInit {
 
     let countryUid = countriesJ[this.country];
 
-    this.dataService.getData(countryUid, this.maxDate.toISOString(), this.endDate.toISOString()).subscribe((data: string) => this.chartData = this.loadChartData(JSON.parse(data), this.selector), err => console.error('Error: ' + err));
+    if (this.countryNotValid() === false) {
+      this.dataService.getData(countryUid, this.maxDate.toISOString(), this.endDate.toISOString()).subscribe((data: string) => this.chartData = this.loadChartData(JSON.parse(data), this.selector), err => console.error('Error: ' + err));
+    }
+
+    
   }
 
   // extracts JSON data from the stream into a data object
@@ -60,7 +70,7 @@ export class VisualizerComponent implements OnInit {
             "series":this.addData(jsonData, selector)
         },
         {
-            "name": selector + " (rolling average)",
+            "name": selector + " (7-day rolling average)",
             "series":this.addData(jsonData, selector, true)
         }
       ];
@@ -107,9 +117,11 @@ export class VisualizerComponent implements OnInit {
   }
 
   // simple method to save server resources: only load chart if input is correct
-  loadChartIfCorrect(){
+  countryNotValid(){
     if (Object.keys(countriesJ).includes(this.country)){
-      this.loadChart()
+      return false;
+    } else {
+      return true;
     }
   }
 
@@ -165,13 +177,5 @@ export class VisualizerComponent implements OnInit {
 
 /*
 TODO:
-
-CORE
 - decide on how to display the two series and implement
-
-OTHER
-- add error handling as much as possible
-- find a more elegant way to validate input than loadChartIfCorrect()
-- handle edge case where user enters wrong country name and changes dates (perhaps by disabling the date buttons -this can also get rid of loadChartIfCorrect())
-
 */
