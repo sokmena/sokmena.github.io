@@ -174,8 +174,3 @@ export class VisualizerComponent implements OnInit {
   }
   
 }
-
-/*
-TODO:
-- decide on how to display the two series and implement
-*/
