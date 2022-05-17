@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { DataService } from '../services/data.service';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -22,17 +22,25 @@ export class VisualizerComponent implements OnInit {
   maxDate: Date = new Date("2020-01-22");
   maxPeriod: number = Math.floor((this.endDate.getTime() - this.maxDate.getTime()) / (1000 * 3600 * 24));
   chartPeriod: number;
+  yScaleMax : number;
 
   // form control and autocomplete elements
   control = new FormControl();
   filteredCountries: Observable<string[]>;
   
-  // shape of the curve
+  // shape and color of the curves
   curve = shape.curveMonotoneX;
+  colorScheme = {
+      domain: [
+        '#85C1E9', 
+        '#BF1919'
+      ]
+    };
 
   // this will feed into the chart
-  chartData : any;
-
+  chartData = [];
+  averageData = [];
+ 
   constructor(private dataService: DataService) { }
 
   
@@ -42,57 +50,65 @@ export class VisualizerComponent implements OnInit {
     this.loadChart();
   }
 
-  // gets the API data into the ngx-chart
+  // gets the API data
   loadChart(){
 
     let countryUid = countriesJ[this.country];
 
-    this.dataService.getData(countryUid, this.startDate.toISOString(), this.endDate.toISOString()).subscribe((data: string) => this.chartData = this.loadChartData(JSON.parse(data), this.selector));
+    if (this.countryNotValid() === false) {
+      this.dataService.getData(countryUid, this.maxDate.toISOString(), this.endDate.toISOString()).subscribe((data: string) => this.chartData = this.loadChartData(JSON.parse(data), this.selector), err => console.error('Error: ' + err));
+    }
+
+    
   }
 
   // extracts JSON data from the stream into a data object
   loadChartData(jsonData: Object, selector: string) {
-
-    if (selector ==='cases') {
       return [
         {
-            "name": "cases",
-            "series":this.addCases(jsonData)
-        }
-      ];
-    } else if (selector ==='deaths') {
-      return [
+            "name": selector,
+            "series":this.addData(jsonData, selector)
+        },
         {
-            "name": "deaths",
-            "series":this.addDeaths(jsonData)
+            "name": selector + " (7-day rolling average)",
+            "series":this.addData(jsonData, selector, true)
         }
       ];
-    }
-    
   }
 
-  addCases(jsonData: Object){
-    let cases = [];
+  // method to turn JSON data to multi-series
+  addData(jsonData: Object, selector: string, average?: boolean) {
+    let data = [];
+    let param : string;
+
+    if (selector === "cases") {
+      param = "confirmed_daily"
+    } else if (selector === "deaths")  {
+      param = "deaths_daily"
+    } else {
+      console.warn("Invalid selector")
+      return
+    }
+
+
     for (const [, [, value]] of Object.entries(Object.entries(jsonData))) {
       
-      cases.push({"name": new Date(value.date).getTime(), "value": value.confirmed_daily});
+      data.push({"name": new Date(value.date).getTime(), "value": value[param]});
 
     }
-    return cases;
-  }
-  
-  addDeaths(jsonData: Object){
-    let deaths = [];
-    for (const [, [, value]] of Object.entries(Object.entries(jsonData))) {
-      
-      deaths.push({"name": new Date(value.date).getTime(), "value": value.deaths_daily});
 
+    // get moving average
+    if (average) {
+    let averageData = this.simpleMovingAverage(data);
+
+    return averageData;
     }
-    return deaths;
+
+    return data;
   }
 
   /*
-  Filter function, based on Codevolution sample 
+  Filter function, based on sample
   link: https://github.com/gopinav/Angular-Material-Tutorial/tree/master/material-demo/src/app/autocomplete
   */
   _filter(value: string) : string[] {
@@ -101,27 +117,18 @@ export class VisualizerComponent implements OnInit {
   }
 
   // simple method to save server resources: only load chart if input is correct
-  loadChartIfCorrect(){
+  countryNotValid(){
     if (Object.keys(countriesJ).includes(this.country)){
-      this.loadChart()
+      return false;
+    } else {
+      return true;
     }
   }
-
-  // formatting for the slider label
-  formatSliderLabel(value: number) {
-    if (value < 30) {
-      return value + 'd';
-    } else if (value >= 30){
-      return Math.floor(value/30) + 'm';
-    }
-    return value;
-  }
-
 
   // sets start date for the chart
   setStartDate(){
     this.startDate = new Date(new Date().setDate(this.endDate.getDate() - this.chartPeriod));
-    this.loadChartIfCorrect();
+    //this.loadChartIfCorrect();
   }
 
   // format chart date to date string
@@ -129,4 +136,41 @@ export class VisualizerComponent implements OnInit {
     return new Date(val).toLocaleString('sv').substring(0,10);
   }
 
+  // a function calculating simple moving average given an array of Objects
+  // modified from source: https://blog.oliverjumpertz.dev/the-moving-average-simple-and-exponential-theory-math-and-implementation-in-javascript
+  simpleMovingAverage(data: any, window = 7) {
+    if (!data || data.length < window) {
+      return [];
+    }
+  
+    let index = window - 1;
+    const length = data.length + 1;
+  
+    let simpleMovingAverages = new Array();
+  
+    while (++index < length) {
+      const windowSlice = data.slice(index - window, index);
+      const valueSlice = windowSlice.map(a => a.value);
+      
+      const sum = valueSlice.reduce((prev, curr) => prev + curr, 0);
+
+      let input = JSON.parse(JSON.stringify(data[Object.keys(data)[index - 1]]));
+      
+      input.value = sum / window;
+      
+      simpleMovingAverages.push(input);
+    }
+    return simpleMovingAverages;
+  }
+
+  // calculates the max value for the y axis based on array values in selected period
+  getYScaleMax() {
+    if (this.chartData.length > 0){
+      let values = this.chartData[0].series.map(a => a.value).slice(-this.chartPeriod);
+      this.yScaleMax = Math.max(...values);
+    }
+
+    return this.yScaleMax;
+  }
+  
 }
